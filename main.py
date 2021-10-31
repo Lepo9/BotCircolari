@@ -1,10 +1,3 @@
-!pip install 
-!telepot pip 
-!install seleniumpip 
-!install python-dotenv`
-
-
-
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
