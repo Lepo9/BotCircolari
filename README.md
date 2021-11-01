@@ -1,14 +1,14 @@
-#Bot di telegram per avvisare della pubblicazione di una nuova circolare
+# Bot di telegram per avvisare della pubblicazione di una nuova circolare
 
-###Premesse
+### Premesse
 Il token non è pubblicato per questioni di privacy.
 
-###Installazione delle librerie
+### Installazione delle librerie
 `pip install telepot`
 `pip install selenium
 `pip install python-dotenv`
 
-###Modifica lirebrie
+### Modifica lirebrie
 
 Sostituire la funzione `def _extract_message(update):` nel file `loop.py` con 
 
@@ -41,7 +41,7 @@ Sostituire la funzione `def _extract_message(update):` nel file `loop.py` con
 
 
 
-###Funzioni
+### Funzioni
 
 `getUltimaCircolare()` Permette di ottenere un dizionario con l'ultima circolare nel formato
 `{"number","link","nome"}`
