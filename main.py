@@ -17,6 +17,7 @@ load_dotenv('.env')
 PATH = ".\chromedriver.exe"
 API_KEY = os.getenv('API_KEY')
 ADMIN_KEY = os.getenv('ADMIN_KEY')
+INTERVALLO_CONTROLLO = 60 #Valore in secondi
 ############
 
 ############
@@ -28,6 +29,7 @@ adminId = set() #id degli admin
 adminCommands = {}
 rispostepronte = {}
 run = True
+listaCircolari = []
 ############
 
 def getUltimaCircolare():
@@ -41,7 +43,8 @@ def getUltimaCircolare():
     return {"number":int(link[58:61]), "link": link,"nome":nome.replace("%20"," ")[9:]}
 
 
-def getCircolare(n):
+
+def getCircolareWeb(n):
     n = int(n)
     if n <= int(ultimaCircolare["number"]) and n > 0:
         driver = webdriver.Chrome(PATH)
@@ -61,6 +64,7 @@ def getCircolare(n):
         return {"number": int(link[58:61]), "link": link, "nome": nome.replace("%20", " ")[9:]}
     else:
         return {"number": -1, "link": -1, "nome": ""}
+
 
 def stampaCircolare(circ):
     risultato = f"CIRCOLARE N° {circ['number']} \n"
@@ -86,6 +90,7 @@ def updateVariables():
     global rispostepronte
     global adminId
     global adminCommands
+    global listaCircolari
     data = updateData()
     for i in data["id"]:
         id.add(i)
@@ -93,12 +98,13 @@ def updateVariables():
     rispostepronte = data["rispostepronte"]
     for i in data["adminId"]:
         adminId.add(i)
+    listaCircolari = data["circ"]
     adminCommands = data["admincommands"]
-
 
 
 def createData():
     data = {"id": list(id),
+            "circ" : listaCircolari,
             "ultimaCircolareVista" : ultimaCircolareVista,
             "rispostepronte" : rispostepronte,
             "adminId": list(adminId),
@@ -112,8 +118,15 @@ def createData():
 #Inizializzazione
 updateVariables()
 ultimaCircolare = getUltimaCircolare()
-###############
 
+def aggiornaListaCircolari():
+    global listaCircolari
+    for i in range(ultimaCircolareVista + 1, ultimaCircolare["number"] + 1):
+        listaCircolari.append(getCircolareWeb(i))
+    updateJson(createData())
+
+aggiornaListaCircolari()
+###############
 
 bot = telepot.Bot(API_KEY)
 print(f"BOT: {bot.getMe()['first_name']} is running.")
@@ -128,10 +141,12 @@ def notify():
     global ultimaCircolareVista
     while ultimaCircolareVista < ultimaCircolare["number"]:
         broadcast("è uscita una nuova circolare!\n------------------------------------\n"
-                  .upper() + stampaCircolare(getCircolare(ultimaCircolareVista+1))
+                  .upper() + stampaCircolare(getCircolareWeb(ultimaCircolareVista+1))
                    + "\nSe non vuoi più ricevere notifiche digita /annullaiscrizione\n")
         ultimaCircolareVista += 1
         updateJson(createData())
+        return True
+    return False
 
 
 def removeId(ID):
@@ -140,8 +155,9 @@ def removeId(ID):
     updateJson(createData())
 
 def saveId(ID):
-    id.add(int(ID))
-    updateJson(createData())
+    if not(ID in id):
+        id.add(int(ID))
+        updateJson(createData())
 
 def removeAdmin(ID):
     ID = int(ID)
@@ -182,7 +198,7 @@ def handle(msg):
     testo = testo.lower()
     for i in range(1,ultimaCircolare["number"]+1):
         if "/"+str(i) == testo:
-            bot.sendMessage(mittente, stampaCircolare(getCircolare(i)))
+            bot.sendMessage(mittente, stampaCircolare(listaCircolari[i-1]))
             comando = "num"
             break
     if comando == "":
@@ -231,6 +247,7 @@ MessageLoop(bot, handle).run_as_thread()
 
 while run:
     ultimaCircolare = getUltimaCircolare()
-    notify()
-    sleep(60)
+    if notify():
+        aggiornaListaCircolari()
+    sleep(INTERVALLO_CONTROLLO)
 
