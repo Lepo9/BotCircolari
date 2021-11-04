@@ -200,15 +200,17 @@ def handle(msg):
     saveId(mittente)
 
     comando = ""
-
-    if len(testo) > 9:
+    if len(testo) >= 9:
         if testo[0:9].lower() == "/adminadd":
             comando = "saveadmin"
-            if testo[9:] == ADMIN_KEY:
-                saveAdmin(mittente)
-                bot.sendMessage(mittente, "Aggiunto alla lista degli admin!\n")
+            if len(testo) > 9:
+                if testo[9:] == ADMIN_KEY:
+                    saveAdmin(mittente)
+                    bot.sendMessage(mittente, "Aggiunto alla lista degli admin!\n")
+                else:
+                    bot.sendMessage(mittente, "Password errata\n")
             else:
-                bot.sendMessage(mittente, "Password errata\n")
+                bot.sendMessage(mittente, "Riscrivi il comando con la sintassi /adminadd[Password]\n")
     testo = testo.lower()
     for i in range(1,ultimaCircolare["number"]+1):
         if "/"+str(i) == testo.lower():
