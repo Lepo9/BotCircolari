@@ -30,6 +30,7 @@ adminCommands = {}
 rispostepronte = {}
 run = True
 listaCircolari = []
+ultimaCircolareSalvata = 0
 ############
 
 def getUltimaCircolare():
@@ -91,6 +92,7 @@ def updateVariables():
     global adminId
     global adminCommands
     global listaCircolari
+    global ultimaCircolareSalvata
     data = updateData()
     for i in data["id"]:
         id.add(i)
@@ -100,12 +102,16 @@ def updateVariables():
         adminId.add(i)
     listaCircolari = data["circ"]
     adminCommands = data["admincommands"]
+    ultimaCircolareSalvata = data["ultimaCircolareSalvata"]
+
 
 
 def createData():
+    global listaCircolari
     data = {"id": list(id),
-            "circ" : listaCircolari,
             "ultimaCircolareVista" : ultimaCircolareVista,
+            "ultimaCircolareSalvata" : ultimaCircolareSalvata,
+            "circ": listaCircolari,
             "rispostepronte" : rispostepronte,
             "adminId": list(adminId),
             "admincommands" :adminCommands
@@ -121,7 +127,9 @@ ultimaCircolare = getUltimaCircolare()
 
 def aggiornaListaCircolari():
     global listaCircolari
-    for i in range(ultimaCircolareVista + 1, ultimaCircolare["number"] + 1):
+    global ultimaCircolareSalvata
+    for i in range(ultimaCircolareSalvata + 1, ultimaCircolare["number"] + 1):
+        ultimaCircolareSalvata += 1
         listaCircolari.append(getCircolareWeb(i))
     updateJson(createData())
 
@@ -134,27 +142,33 @@ print(f"BOT: {bot.getMe()['first_name']} is running.")
 
 def broadcast (message):
     message = str(message)
+    print(f"Broadcasting:\n{message}")
     for i in id:
-        bot.sendMessage(int(i), message)
+        try:
+            bot.sendMessage(int(i), message)
+        except:
+            pass
 
 def notify():
     global ultimaCircolareVista
     while ultimaCircolareVista < ultimaCircolare["number"]:
-        broadcast("è uscita una nuova circolare!\n------------------------------------\n"
-                  .upper() + stampaCircolare(getCircolareWeb(ultimaCircolareVista+1))
-                   + "\nSe non vuoi più ricevere notifiche digita /annullaiscrizione\n")
         ultimaCircolareVista += 1
         updateJson(createData())
+        broadcast("è uscita una nuova circolare!\n------------------------------------\n"
+                  .upper() + stampaCircolare(getCircolareWeb(ultimaCircolareVista))
+                   + "\nSe non vuoi più ricevere notifiche digita /annullaiscrizione\n")
         return True
     return False
 
 
 def removeId(ID):
+    global id
     ID = int(ID)
     id.remove(ID)
     updateJson(createData())
 
 def saveId(ID):
+    global id
     if not(ID in id):
         id.add(int(ID))
         updateJson(createData())
@@ -197,7 +211,7 @@ def handle(msg):
                 bot.sendMessage(mittente, "Password errata\n")
     testo = testo.lower()
     for i in range(1,ultimaCircolare["number"]+1):
-        if "/"+str(i) == testo:
+        if "/"+str(i) == testo.lower():
             bot.sendMessage(mittente, stampaCircolare(listaCircolari[i-1]))
             comando = "num"
             break
@@ -215,6 +229,15 @@ def handle(msg):
                 admin = True
                 break
 
+        if testo[0:15].lower() == "/adminbroadcast":
+            if admin:
+                broadcast(msg['text'][16:])
+                bot.sendMessage(mittente,adminCommands["/adminbroadcast [Messaggio]"])
+                comando = "broadcast"
+            else:
+                bot.sendMessage(mittente, "Non sei un amministratore!\n")
+                comando = "NOTADMIN"
+
         for c, r in adminCommands.items():
             if testo == c:
                 if admin:
@@ -224,6 +247,7 @@ def handle(msg):
                     bot.sendMessage(mittente, "Non sei un amministratore!\n")
                     comando = "NOTADMIN"
                 break
+
 
 
     if comando != "":
@@ -246,8 +270,8 @@ MessageLoop(bot, handle).run_as_thread()
 
 
 while run:
-    ultimaCircolare = getUltimaCircolare()
     if notify():
         aggiornaListaCircolari()
     sleep(INTERVALLO_CONTROLLO)
+    ultimaCircolare = getUltimaCircolare()
 
