@@ -199,8 +199,9 @@ def handle(msg):
     print(f"Da: {mittente} Messaggio: {testo}")
 
     saveId(mittente)
-
     comando = ""
+
+    #adminAdd
     if len(testo) >= 9:
         if testo[0:9].lower() == "/adminadd":
             comando = "saveadmin"
@@ -212,12 +213,15 @@ def handle(msg):
                     bot.sendMessage(mittente, "Password errata\n")
             else:
                 bot.sendMessage(mittente, "Riscrivi il comando con la sintassi /adminadd[Password]\n")
-    testo = testo.lower()
+
+    #Cerca circolare per numero
     for i in range(1,ultimaCircolare["number"]+1):
         if "/"+str(i) == testo.lower():
             bot.sendMessage(mittente, stampaCircolare(listaCircolari[i-1]))
             comando = "num"
             break
+
+    #Risposte automatiche
     if comando == "":
         for c,r in rispostepronte.items():
             if testo.lower() == c:
@@ -232,11 +236,16 @@ def handle(msg):
                 admin = True
                 break
 
+        #Admin broadcast
         if testo[0:15].lower() == "/adminbroadcast":
             if admin:
-                broadcast(msg['text'][16:])
-                bot.sendMessage(mittente,adminCommands["/adminbroadcast [Messaggio]"])
-                comando = "broadcast"
+                if len(testo)>=17:
+                    broadcast(msg['text'][16:])
+                    bot.sendMessage(mittente,adminCommands["/adminbroadcast [Messaggio]"])
+                    comando = "broadcast"
+                else:
+                    bot.sendMessage(mittente, "Dopo il comando inserisci uno spazio e il tuo messaggio!")
+                    comando = "null"
             else:
                 bot.sendMessage(mittente, "Non sei un amministratore!\n")
                 comando = "NOTADMIN"
