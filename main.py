@@ -225,11 +225,24 @@ def handle(msg):
                 bot.sendMessage(mittente, "Riscrivi il comando con la sintassi /adminadd[Password]\n")
 
     #Cerca circolare per numero
-    for i in range(1,ultimaCircolare["number"]+1):
+    for i in range(1,ultimaCircolareSalvata+1):
         if "/"+str(i) == testo.lower():
             bot.sendMessage(mittente, stampaCircolare(listaCircolari[i-1]))
             comando = "num"
             break
+
+    #Cerca circolare per parole
+    if testo[0:6].lower() == "/cerca":
+        parola = testo[7:].upper()
+        risposta = ""
+        for i in reversed(range(1,ultimaCircolareSalvata+1)):
+            if parola.find(listaCircolari[i]["nome"]) != -1:
+                risposta += f"/{listaCircolari[i]['number']} -> {listaCircolari[i]['number']}\n"
+        if risposta == "":
+            risposta = "Nessuna corrispondenza trovata!"
+
+        bot.sendMessage(mittente,risposta)
+
 
     #Risposte automatiche
     if comando == "":
