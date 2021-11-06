@@ -108,13 +108,14 @@ def updateVariables():
 
 def createData():
     global listaCircolari
-    data = {"id": list(id),
+    data = {
             "ultimaCircolareVista" : ultimaCircolareVista,
             "ultimaCircolareSalvata" : ultimaCircolareSalvata,
-            "circ": listaCircolari,
             "rispostepronte" : rispostepronte,
+            "admincommands" :adminCommands,
             "adminId": list(adminId),
-            "admincommands" :adminCommands
+            "id": list(id),
+            "circ": listaCircolari
             }
     return data
 
@@ -240,6 +241,7 @@ def handle(msg):
                 bot.sendMessage(mittente, "Non sei un amministratore!\n")
                 comando = "NOTADMIN"
 
+
         for c, r in adminCommands.items():
             if testo == c:
                 if admin:
@@ -249,8 +251,6 @@ def handle(msg):
                     bot.sendMessage(mittente, "Non sei un amministratore!\n")
                     comando = "NOTADMIN"
                 break
-
-
 
     if comando != "":
         if comando == "/annullaiscrizione":
@@ -264,6 +264,9 @@ def handle(msg):
                 else:
                     if comando == "/adminstop":
                         run = False
+                    else:
+                        if comando == "/adminrun":
+                            run = True
     else:
         bot.sendMessage(mittente, 'Comando non supporato!\nDigita /help per la lista dei comandi\n')
 
@@ -276,4 +279,5 @@ while run:
         aggiornaListaCircolari()
     sleep(INTERVALLO_CONTROLLO)
     ultimaCircolare = getUltimaCircolare()
+
 
