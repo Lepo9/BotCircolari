@@ -233,7 +233,7 @@ def handle(msg):
 
     #Cerca circolare per parole
     if testo[0:6].lower() == "/cerca":
-        if len(testo) == 6 or len(testo == 7):
+        if len(testo) == 6 or len(testo) == 7:
             bot.sendMessage(mittente, "Dopo /cerca metti uno spazio e le parole che vuoi cercare!")
         else:
             parola = testo[7:].upper()
