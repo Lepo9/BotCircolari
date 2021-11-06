@@ -234,14 +234,15 @@ def handle(msg):
     #Cerca circolare per parole
     if testo[0:6].lower() == "/cerca":
         parola = testo[7:].upper()
-        risposta = ""
-        for i in reversed(range(1,ultimaCircolareSalvata+1)):
-            if parola.find(listaCircolari[i]["nome"]) != -1:
-                risposta += f"/{listaCircolari[i]['number']} -> {listaCircolari[i]['number']}\n"
-        if risposta == "":
+        risposta = "Risultati inerenti:\n"
+        for i in reversed(range(0,ultimaCircolareSalvata)):
+            if listaCircolari[i]["nome"].find(parola) != -1:
+                risposta += f"/{listaCircolari[i]['number']} -> {listaCircolari[i]['nome']}\n"
+        if risposta == "Risultati inerenti:\n":
             risposta = "Nessuna corrispondenza trovata!"
 
         bot.sendMessage(mittente,risposta)
+        comando = "cerca"
 
 
     #Risposte automatiche
