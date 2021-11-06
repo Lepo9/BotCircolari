@@ -62,10 +62,12 @@ liste del programma
 `createData()` Ritorna una serie di dati che corrispondono al file `data.json`
 ma prendendo i valori dalle variabili del programma
 
-
+`aggiornaListaCircolari()`Permette di aggiornare l a lista delle circolari salvate
 
 
 `broadcast(message)` Permette di inviare a tutti un messaggio
+
+`broadcastAdmin(message)` Permette di inviare a tutti gli admin un messaggio
 
 `notify()` Invia a tutti se esce una nuova circolare
 

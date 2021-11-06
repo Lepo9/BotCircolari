@@ -150,6 +150,15 @@ def broadcast (message):
         except:
             pass
 
+def broadcastAdmin (message):
+    message = str(message)
+    print(f"Broadcasting to Admins:\n{message}")
+    for i in adminId:
+        try:
+            bot.sendMessage(int(i), message)
+        except:
+            pass
+
 def notify():
     global ultimaCircolareVista
     while ultimaCircolareVista < ultimaCircolare["number"]:
@@ -191,12 +200,13 @@ def saveAdmin(ID):
 
 def handle(msg):
     #print(msg)
+    #{'message_id': 348, 'from': {'id': 1706639354, 'is_bot': False, 'first_name': 'Marco', 'last_name': 'Leporati', 'username': 'Leporati9', 'language_code': 'en'}, 'chat': {'id': 1706639354, 'first_name': 'Marco', 'last_name': 'Leporati', 'username': 'Leporati9', 'type': 'private'}, 'date': 1636184931, 'text': '.'}
 
     global run
     testo = msg['text']
     mittente = int(msg['from']['id'])
 
-    print(f"Da: {mittente} Messaggio: {testo}")
+    print(f"Da: {msg['from']['username']} - {mittente}. Messaggio: {testo}")
 
     saveId(mittente)
     comando = ""
@@ -241,8 +251,8 @@ def handle(msg):
             if admin:
                 if len(testo)>=17:
                     broadcast(msg['text'][16:])
-                    bot.sendMessage(mittente,adminCommands["/adminbroadcast [Messaggio]"])
-                    comando = "broadcast"
+                    broadcastAdmin(f"L'admin {msg['from']['username']} ha inviato il messaggio:\n{msg['text'][16:]}")
+                    comando = "null"
                 else:
                     bot.sendMessage(mittente, "Dopo il comando inserisci uno spazio e il tuo messaggio!")
                     comando = "null"
@@ -250,9 +260,9 @@ def handle(msg):
                 bot.sendMessage(mittente, "Non sei un amministratore!\n")
                 comando = "NOTADMIN"
 
-
+        #Risposte automatiche per i comadi admin
         for c, r in adminCommands.items():
-            if testo == c:
+            if testo.lower() == c:
                 if admin:
                     comando = c
                     bot.sendMessage(mittente,r)
@@ -261,6 +271,7 @@ def handle(msg):
                     comando = "NOTADMIN"
                 break
 
+    #Azioni in caso dei comandi
     if comando != "":
         if comando == "/annullaiscrizione":
             removeId(mittente)
@@ -273,9 +284,12 @@ def handle(msg):
                 else:
                     if comando == "/adminstop":
                         run = False
+                        broadcastAdmin(f"Stop del programma rischiesto da {msg['from']['username']}")
                     else:
                         if comando == "/adminrun":
                             run = True
+                            broadcastAdmin(f"Run del programma rischiesto da {msg['from']['username']}")
+
     else:
         bot.sendMessage(mittente, 'Comando non supporato!\nDigita /help per la lista dei comandi\n')
 
@@ -288,5 +302,7 @@ while run:
         aggiornaListaCircolari()
     sleep(INTERVALLO_CONTROLLO)
     ultimaCircolare = getUltimaCircolare()
+    if not run:
+        broadcastAdmin("Bot: spento")
 
 
