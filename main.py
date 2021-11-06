@@ -166,7 +166,7 @@ def notify():
         updateJson(createData())
         broadcast("è uscita una nuova circolare!\n------------------------------------\n"
                   .upper() + stampaCircolare(getCircolareWeb(ultimaCircolareVista))
-                   + "\nSe non vuoi più ricevere notifiche digita /annullaiscrizione\n")
+                   + "\nSe non vuoi più ricevere notifiche digita \n/annullaiscrizione\n")
         return True
     return False
 
@@ -233,15 +233,18 @@ def handle(msg):
 
     #Cerca circolare per parole
     if testo[0:6].lower() == "/cerca":
-        parola = testo[7:].upper()
-        risposta = "Risultati inerenti:\n"
-        for i in reversed(range(0,ultimaCircolareSalvata)):
-            if listaCircolari[i]["nome"].find(parola) != -1:
-                risposta += f"/{listaCircolari[i]['number']} -> {listaCircolari[i]['nome']}\n"
-        if risposta == "Risultati inerenti:\n":
-            risposta = "Nessuna corrispondenza trovata!"
+        if len(testo) == 6 or len(testo == 7):
+            bot.sendMessage(mittente, "Dopo /cerca metti uno spazio e le parole che vuoi cercare!")
+        else:
+            parola = testo[7:].upper()
+            risposta = "Risultati inerenti:\n"
+            for i in reversed(range(0,ultimaCircolareSalvata)):
+                if listaCircolari[i]["nome"].find(parola) != -1:
+                    risposta += f"/{listaCircolari[i]['number']} -> {listaCircolari[i]['nome']}\n"
+            if risposta == "Risultati inerenti:\n":
+                risposta = "Nessuna corrispondenza trovata!"
 
-        bot.sendMessage(mittente,risposta)
+            bot.sendMessage(mittente,risposta)
         comando = "cerca"
 
 
