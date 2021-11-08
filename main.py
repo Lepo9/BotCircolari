@@ -15,7 +15,7 @@ load_dotenv('.env')
 
 ############
 #Costanti
-PATH = ".\chromedriver.exe"
+PATH = ".\chromedriver"
 API_KEY = os.getenv('API_KEY')
 ADMIN_KEY = os.getenv('ADMIN_KEY')
 INTERVALLO_CONTROLLO = 60 #Valore in secondi
@@ -234,7 +234,7 @@ def handle(msg):
     testo = msg['text']
     mittente = int(msg['from']['id'])
 
-    print(f"Da: {msg['from']['username']} - {mittente}. Messaggio: {testo}")
+    print(f"Da: {mittente}. Messaggio: {testo}")
 
     saveId(mittente)
     comando = ""
@@ -296,7 +296,7 @@ def handle(msg):
             if admin:
                 if len(testo)>=17:
                     broadcast(msg['text'][16:])
-                    broadcastAdmin(f"L'admin {msg['from']['username']} ha inviato il messaggio:\n{msg['text'][16:]}")
+                    broadcastAdmin(f"L'admin {msg['from']['id']} ha inviato il messaggio:\n{msg['text'][16:]}")
                     comando = "null"
                 else:
                     bot.sendMessage(mittente, "Dopo il comando inserisci uno spazio e il tuo messaggio!")
@@ -329,11 +329,11 @@ def handle(msg):
                 else:
                     if comando == "/adminstop":
                         run = False
-                        broadcastAdmin(f"Stop del programma rischiesto da {msg['from']['username']}")
+                        broadcastAdmin(f"Stop del programma rischiesto da {msg['from']['id']}")
                     else:
                         if comando == "/adminrun":
                             run = True
-                            broadcastAdmin(f"Run del programma rischiesto da {msg['from']['username']}")
+                            broadcastAdmin(f"Run del programma rischiesto da {msg['from']['id']}")
 
     else:
         bot.sendMessage(mittente, 'Comando non supporato!\nDigita /help per la lista dei comandi\n')
