@@ -10,6 +10,7 @@ import os
 import telepot
 from telepot.loop import MessageLoop
 import html
+import requests
 load_dotenv('.env')
 
 ############
@@ -31,6 +32,7 @@ rispostepronte = {}
 run = True
 listaCircolari = []
 ultimaCircolareSalvata = 0
+bot = 0
 ############
 
 def getUltimaCircolare():
@@ -133,10 +135,18 @@ def createData():
             }
     return data
 
-
+def inizialiseBot():
+    try:
+        request = requests.get("https://google.com")
+        return telepot.Bot(API_KEY)
+    except (requests.ConnectionError, requests.Timeout) as exception:
+        print("Connessione fallita! Bot non inizializzato")
+        sleep(INTERVALLO_CONTROLLO)
+        return inizialiseBot()
 
 ############
 #Inizializzazione
+
 updateVariables()
 ultimaCircolare = getUltimaCircolare()
 
@@ -148,10 +158,14 @@ def aggiornaListaCircolari():
         listaCircolari.append(getCircolareWeb(i))
     updateJson(createData())
 
+
+
 aggiornaListaCircolari()
+bot = inizialiseBot()
+
 ###############
 
-bot = telepot.Bot(API_KEY)
+
 print(f"BOT: {bot.getMe()['first_name']} is running.")
 
 
