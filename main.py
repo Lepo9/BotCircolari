@@ -34,37 +34,51 @@ ultimaCircolareSalvata = 0
 ############
 
 def getUltimaCircolare():
-    #https://www.iiscastelli.edu.it/Documents/circolari/CIRC%20107%202EM%20-%20CONVOCAZIONE%20CONSIGLIO%20DI%20CLASSE%20STRAORDINARIO.pdf
-    driver = webdriver.Chrome(PATH)
-    driver.get("https://www.iiscastelli.edu.it/pager.aspx?page=circolari")
-    assert "Circolari" in driver.title
-    link = driver.find_element_by_partial_link_text('CIRC ').get_property('href')
-    driver.close()
-    nome = link[51:-4]
-    return {"number":int(link[58:61]), "link": link,"nome":nome.replace("%20"," ")[9:]}
+    try:
+        #https://www.iiscastelli.edu.it/Documents/circolari/CIRC%20107%202EM%20-%20CONVOCAZIONE%20CONSIGLIO%20DI%20CLASSE%20STRAORDINARIO.pdf
+        driver = webdriver.Chrome(PATH)
+        driver.get("https://www.iiscastelli.edu.it/pager.aspx?page=circolari")
+        assert "Circolari" in driver.title
+        link = driver.find_element_by_partial_link_text('CIRC ').get_property('href')
+        driver.close()
+        nome = link[51:-4]
+        return {"number":int(link[58:61]), "link": link,"nome":nome.replace("%20"," ")[9:]}
+    except:
+        print("Connessione fallita! Def: getUltimaCircolare")
+        driver.close()
+        sleep(INTERVALLO_CONTROLLO)
+        return getUltimaCircolare()
+
 
 
 
 def getCircolareWeb(n):
-    n = int(n)
-    if n <= int(ultimaCircolare["number"]) and n > 0:
-        driver = webdriver.Chrome(PATH)
-        driver.get("https://www.iiscastelli.edu.it/pager.aspx?page=circolari")
-        assert "Circolari" in driver.title
-        parolaRicerca = 'CIRC '
-        if n < 10:
-            parolaRicerca += "00"
-        else:
-            if n <100:
-                parolaRicerca += "0"
+    try:
+        n = int(n)
+        if n <= int(ultimaCircolare["number"]) and n > 0:
+            driver = webdriver.Chrome(PATH)
+            driver.get("https://www.iiscastelli.edu.it/pager.aspx?page=circolari")
+            assert "Circolari" in driver.title
+            parolaRicerca = 'CIRC '
+            if n < 10:
+                parolaRicerca += "00"
+            else:
+                if n <100:
+                    parolaRicerca += "0"
 
-        parolaRicerca += str(n)
-        link = driver.find_element_by_partial_link_text(parolaRicerca).get_property('href')
+            parolaRicerca += str(n)
+            link = driver.find_element_by_partial_link_text(parolaRicerca).get_property('href')
+            driver.close()
+            nome = link[51:-4]
+            return {"number": int(link[58:61]), "link": link, "nome": nome.replace("%20", " ")[9:]}
+        else:
+            return {"number": -1, "link": -1, "nome": ""}
+    except:
+        print("Connessione fallita! Def: getCircolareWeb")
         driver.close()
-        nome = link[51:-4]
-        return {"number": int(link[58:61]), "link": link, "nome": nome.replace("%20", " ")[9:]}
-    else:
-        return {"number": -1, "link": -1, "nome": ""}
+        sleep(INTERVALLO_CONTROLLO)
+        return getCircolareWeb(n)
+
 
 
 def stampaCircolare(circ):
