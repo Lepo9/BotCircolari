@@ -135,14 +135,14 @@ def createData():
             }
     return data
 
-def inizialiseBot():
+def initializeBot():
     try:
         request = requests.get("https://google.com")
         return telepot.Bot(API_KEY)
     except (requests.ConnectionError, requests.Timeout) as exception:
         print("Connessione fallita! Bot non inizializzato")
         sleep(INTERVALLO_CONTROLLO)
-        return inizialiseBot()
+        return initializeBot()
 
 ############
 #Inizializzazione
@@ -161,7 +161,7 @@ def aggiornaListaCircolari():
 
 
 aggiornaListaCircolari()
-bot = inizialiseBot()
+bot = initializeBot()
 
 ###############
 

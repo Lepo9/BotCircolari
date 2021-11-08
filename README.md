@@ -5,8 +5,12 @@ Il token non è pubblicato per questioni di privacy.
 
 ### Installazione delle librerie
 `pip install telepot`
-`pip install selenium
+
+`pip install selenium`
+
 `pip install python-dotenv`
+
+`pip install requests`
 
 ### Modifica lirebrie
 
@@ -61,6 +65,8 @@ liste del programma
 
 `createData()` Ritorna una serie di dati che corrispondono al file `data.json`
 ma prendendo i valori dalle variabili del programma
+
+`initializeBot()` Inizializza il bot
 
 `aggiornaListaCircolari()`Permette di aggiornare l a lista delle circolari salvate
 
